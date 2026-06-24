@@ -1,0 +1,6 @@
+{
+  "name": "Gambit",
+  "description": "A high-quality chess game analyzer powered by Stockfish and Gemini AI. Analyze raw PGN, FEN, Chess.com, or Lichess game links, with real-time chess engine evaluations and expert AI coaching.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

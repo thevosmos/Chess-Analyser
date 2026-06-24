@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default catch-all denies all access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Auth utility functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Specific validation helper for UserProfile entities
+    function isValidUserProfile(data) {
+      return data.uid == request.auth.uid
+        && (data.email == null || (data.email is string && data.email.size() <= 256))
+        && (data.boardTheme == null || (data.boardTheme is string && data.boardTheme.size() <= 32))
+        && (data.customColors == null || (
+             data.customColors is map
+             && data.customColors.light is string && data.customColors.light.size() <= 16
+             && data.customColors.dark is string && data.customColors.dark.size() <= 16
+           ))
+        && (data.updatedAt == null || data.updatedAt is timestamp || data.updatedAt is string);
+    }
+
+    // Match block for /users/{userId} collection
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming());
+      allow update: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming())
+                     && incoming().diff(existing()).affectedKeys().hasOnly(['boardTheme', 'customColors', 'updatedAt']);
+      allow delete: if false;
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User preferences and custom board styles",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "The unique authenticated identifier for the user"
+        },
+        "email": {
+          "type": "string",
+          "description": "User's verified email address"
+        },
+        "boardTheme": {
+          "type": "string",
+          "enum": ["gambit", "forest", "wood", "blue", "slate", "custom"],
+          "description": "The active theme selection identifier"
+        },
+        "customColors": {
+          "type": "object",
+          "properties": {
+            "light": {
+              "type": "string",
+              "description": "HEX color string for light chess squares"
+            },
+            "dark": {
+              "type": "string",
+              "description": "HEX color string for dark chess squares"
+            }
+          },
+          "required": ["light", "dark"],
+          "description": "Custom color hexadecimal strings chosen by the user"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Latest update timestamp of the profile custom configuration"
+        }
+      },
+      "required": ["uid"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profiles storing personal chess environment preferences"
+    }
+  }
+}
