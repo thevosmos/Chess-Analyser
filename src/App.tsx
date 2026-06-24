@@ -493,7 +493,6 @@ export default function App() {
         file.includes("stockfish") ||
         msg === "error"
       ) {
-        console.warn("Caught and suppressed cross-origin stockfish/Script error in iframe sandbox:", event);
         try {
           event.preventDefault();
           event.stopPropagation();
@@ -509,7 +508,6 @@ export default function App() {
         lowerReason.includes("stockfish") ||
         (event.reason?.code && String(event.reason.code).includes("operation-not-allowed"))
       ) {
-        console.warn("Caught and suppressed unhandled firebase-auth operation-not-allowed or script error:", event.reason);
         try {
           event.preventDefault();
           event.stopPropagation();

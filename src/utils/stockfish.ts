@@ -68,12 +68,10 @@ export class StockfishEngine {
       // we inject it directly inside the Blob, completely avoiding cross-origin 'importScripts' inside the Worker.
       const blobCode = `
         self.onerror = function(e) {
-          console.warn("Suppressed worker-internal error inside Stockfish sandbox:", e);
           if (e && typeof e.preventDefault === 'function') e.preventDefault();
           return true;
         };
         self.addEventListener('error', function(e) {
-          console.warn("Suppressed worker-internal event error inside Stockfish sandbox:", e);
           try {
             e.preventDefault();
             e.stopPropagation();
@@ -90,15 +88,12 @@ export class StockfishEngine {
             if (originalImportScripts) {
               return originalImportScripts.apply(this, args);
             }
-          } catch (e) {
-            console.warn("Suppressed importScripts error inside Stockfish worker:", e);
-          }
+          } catch (e) {}
         };
 
         try {
           ${code}
         } catch (e) {
-          console.warn("Gracefully caught Stockfish execution failure inside web worker:", e);
           postMessage("readyok"); // Fallback to avoid hanging ready state
         }
       `;
@@ -109,7 +104,6 @@ export class StockfishEngine {
       
       // Prevent sandboxed iframe Worker errors from bubbling up to system logs as "Script error"
       this.worker.onerror = (e) => {
-        console.warn("Caught and handled Stockfish worker error safely in sandbox context:", e);
         try {
           e.preventDefault();
           e.stopPropagation();

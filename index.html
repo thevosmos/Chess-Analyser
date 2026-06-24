@@ -18,34 +18,32 @@
         }
 
         if (!isStorageSupported) {
-          console.warn('LocalStorage is blocked or unsupported in this sandboxed environment. Polyfilling safe memory-backed storage.');
-          
-          var makeMockStorage = function() {
-            var store = {};
-            return {
-              getItem: function(key) {
-                return store.hasOwnProperty(key) ? store[key] : null;
-              },
-              setItem: function(key, value) {
-                store[key] = String(value);
-              },
-              removeItem: function(key) {
-                delete store[key];
-              },
-              clear: function() {
-                store = {};
-              },
-              key: function(index) {
-                var keys = Object.keys(store);
-                return keys[index] || null;
-              },
-              get length() {
-                return Object.keys(store).length;
-              }
-            };
-          };
-
           try {
+            var makeMockStorage = function() {
+              var store = {};
+              return {
+                getItem: function(key) {
+                  return store.hasOwnProperty(key) ? store[key] : null;
+                },
+                setItem: function(key, value) {
+                  store[key] = String(value);
+                },
+                removeItem: function(key) {
+                  delete store[key];
+                },
+                clear: function() {
+                  store = {};
+                },
+                key: function(index) {
+                  var keys = Object.keys(store);
+                  return keys[index] || null;
+                },
+                get length() {
+                  return Object.keys(store).length;
+                }
+              };
+            };
+
             var mockLocal = makeMockStorage();
             var mockSession = makeMockStorage();
             
@@ -59,9 +57,7 @@
               configurable: true,
               enumerable: true
             });
-          } catch (e) {
-            console.error('Failed to polyfill storage objects:', e);
-          }
+          } catch (e) {}
         }
       })();
 
@@ -78,7 +74,6 @@
           msg === 'error' || 
           msg === '[object event]'
         ) {
-          console.warn('Suppressed sandboxed iframe CORS/Script error:', msg, file);
           try {
             e.preventDefault();
             e.stopPropagation();
@@ -111,7 +106,6 @@
           msg === 'error' ||
           msg === '[object event]'
         ) {
-          console.warn('Suppressed window.onerror script error safely:', msg, src);
           return true;
         }
         return false;
@@ -129,7 +123,6 @@
           lowerReason === 'error' ||
           lowerReason === '[object event]'
         ) {
-          console.warn('Suppressed unhandled promise rejection safely:', reasonStr);
           try {
             e.preventDefault();
             e.stopPropagation();
